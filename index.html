@@ -963,8 +963,25 @@ function changeAdminPw(){
   const np=document.getElementById('NPW');
   if(np?.value){db.ref('adminPw').set(np.value);toast('✓ Contraseña cambiada');}
 }
-function saveAdminGroup(gk){saveG();toast('✓ '+GROUPS[gk].name+' guardado');}
-function saveAdminKO(label){saveG();toast('✓ '+label+' guardado');}
+function collectAdminInputs(){
+  document.querySelectorAll('input[data-res]').forEach(inp=>{
+    const mid=inp.dataset.res,s=inp.dataset.s;
+    if(!G.results[mid])G.results[mid]={h:'',a:''};
+    G.results[mid][s]=inp.value===''?'':+inp.value;
+  });
+  document.querySelectorAll('input[data-kt]').forEach(inp=>{
+    G.kt[inp.dataset.kt]=inp.value;
+  });
+}
+function saveAdminGroup(gk){
+  collectAdminInputs();
+  db.ref('results').set(G.results).then(()=>toast('✓ '+GROUPS[gk].name+' guardado'));
+}
+function saveAdminKO(label){
+  collectAdminInputs();
+  db.ref('results').set(G.results).then(()=>{});
+  db.ref('kt').set(G.kt).then(()=>toast('✓ '+label+' guardado'));
+}
 function saveAdminBonus(){
   const c=document.getElementById('BRC')?.value||'';
   const g=document.getElementById('BRG')?.value||'';
