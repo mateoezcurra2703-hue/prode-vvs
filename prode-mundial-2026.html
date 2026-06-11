@@ -318,6 +318,36 @@ const FLAGS = {
 };
 const f = t => FLAGS[t]||'🏳️';
 
+
+// Horarios oficiales de cada partido (UTC)
+const MATCH_TIMES = {
+  GA1:'2026-06-11T19:00:00Z', GA2:'2026-06-12T02:00:00Z', GA3:'2026-06-19T01:00:00Z',
+  GA4:'2026-06-18T16:00:00Z', GA5:'2026-06-25T01:00:00Z', GA6:'2026-06-25T01:00:00Z',
+  GB1:'2026-06-12T19:00:00Z', GB2:'2026-06-13T19:00:00Z', GB3:'2026-06-18T22:00:00Z',
+  GB4:'2026-06-18T19:00:00Z', GB5:'2026-06-24T19:00:00Z', GB6:'2026-06-24T19:00:00Z',
+  GC1:'2026-06-13T22:00:00Z', GC2:'2026-06-14T01:00:00Z', GC3:'2026-06-20T00:30:00Z',
+  GC4:'2026-06-19T22:00:00Z', GC5:'2026-06-24T22:00:00Z', GC6:'2026-06-24T22:00:00Z',
+  GD1:'2026-06-13T01:00:00Z', GD2:'2026-06-14T04:00:00Z', GD3:'2026-06-19T19:00:00Z',
+  GD4:'2026-06-20T03:00:00Z', GD5:'2026-06-26T02:00:00Z', GD6:'2026-06-26T02:00:00Z',
+  GE1:'2026-06-14T17:00:00Z', GE2:'2026-06-14T23:00:00Z', GE3:'2026-06-20T20:00:00Z',
+  GE4:'2026-06-21T00:00:00Z', GE5:'2026-06-25T20:00:00Z', GE6:'2026-06-25T20:00:00Z',
+  GF1:'2026-06-14T20:00:00Z', GF2:'2026-06-15T02:00:00Z', GF3:'2026-06-21T02:00:00Z',
+  GF4:'2026-06-21T04:00:00Z', GF5:'2026-06-25T23:00:00Z', GF6:'2026-06-25T23:00:00Z',
+  GG1:'2026-06-15T19:00:00Z', GG2:'2026-06-16T01:00:00Z', GG3:'2026-06-21T19:00:00Z',
+  GG4:'2026-06-22T01:00:00Z', GG5:'2026-06-27T03:00:00Z', GG6:'2026-06-27T03:00:00Z',
+  GH1:'2026-06-15T16:00:00Z', GH2:'2026-06-15T22:00:00Z', GH3:'2026-06-21T16:00:00Z',
+  GH4:'2026-06-21T22:00:00Z', GH5:'2026-06-27T00:00:00Z', GH6:'2026-06-27T00:00:00Z',
+  GI1:'2026-06-16T19:00:00Z', GI2:'2026-06-16T22:00:00Z', GI3:'2026-06-22T21:00:00Z',
+  GI4:'2026-06-23T00:00:00Z', GI5:'2026-06-26T19:00:00Z', GI6:'2026-06-26T19:00:00Z',
+  GJ1:'2026-06-17T01:00:00Z', GJ2:'2026-06-17T04:00:00Z', GJ3:'2026-06-22T17:00:00Z',
+  GJ4:'2026-06-23T03:00:00Z', GJ5:'2026-06-28T02:00:00Z', GJ6:'2026-06-28T02:00:00Z',
+  GK1:'2026-06-17T17:00:00Z', GK2:'2026-06-18T02:00:00Z', GK3:'2026-06-23T17:00:00Z',
+  GK4:'2026-06-24T02:00:00Z', GK5:'2026-06-27T23:30:00Z', GK6:'2026-06-27T23:30:00Z',
+  GL1:'2026-06-17T20:00:00Z', GL2:'2026-06-17T23:00:00Z', GL3:'2026-06-23T20:00:00Z',
+  GL4:'2026-06-23T23:00:00Z', GL5:'2026-06-27T21:00:00Z', GL6:'2026-06-27T21:00:00Z',
+};
+function matchStarted(mid){ const t=MATCH_TIMES[mid]; return t ? new Date()>=new Date(t) : false; }
+
 const GROUP_MATCHES = [];
 for(const[gk,g]of Object.entries(GROUPS)){
   const t=g.teams;
@@ -611,13 +641,13 @@ function matchRow(mid,home,away,isKO){
     <div class="team right">${home} <span style="font-size:1.1rem">${f(home)}</span></div>
     <div class="score-box">
       <input type="number" min="0" max="20" value="${p.h!=null&&p.h!==''?p.h:''}" placeholder="—"
-             data-mid="${mid}" data-s="h" ${hasResult(rv)?'disabled':''}/>
+             data-mid="${mid}" data-s="h" ${hasResult(rv)||matchStarted(mid)?'disabled':''}/>
       <span class="score-sep">:</span>
       <input type="number" min="0" max="20" value="${p.a!=null&&p.a!==''?p.a:''}" placeholder="—"
-             data-mid="${mid}" data-s="a" ${hasResult(rv)?'disabled':''}/>
+             data-mid="${mid}" data-s="a" ${hasResult(rv)||matchStarted(mid)?'disabled':''}/>
     </div>
     <div class="team"><span style="font-size:1.1rem">${f(away)}</span> ${away}</div>
-    <div style="min-width:58px;text-align:center">${hasResult(rv)?`<div class="result-score">${rv.h}-${rv.a}</div>${tag}`:tag}</div>
+    <div style="min-width:58px;text-align:center">${hasResult(rv)?`<div class="result-score">${rv.h}-${rv.a}</div>${tag}`:matchStarted(mid)&&!isKO?`<span style="font-size:0.72rem;color:var(--muted)">🔒</span>`:tag}</div>
   </div>`;
 }
 
@@ -660,7 +690,7 @@ function teamStats(gk,team){
 
 // ── ELIMINATORIAS ────────────────────────────────────────────────────────────
 
-const WORLD_CUP_START = new Date('2026-06-11T20:00:00Z');
+const WORLD_CUP_START = new Date('2026-06-11T19:00:00Z');
 function rKO(){
   const bonusLocked = new Date() >= WORLD_CUP_START;
   const bonus=getBonus(CU),br=G.results.bonus||{};
@@ -950,7 +980,7 @@ function toast(msg){
 
 
 function rCountdown(){
-  const target = new Date('2026-06-11T20:00:00Z');
+  const target = new Date('2026-06-11T19:00:00Z');
   const now = new Date();
   const diff = target - now;
   if(diff <= 0) return `<div class="cd-card"><div class="cd-title">⚽ Copa del Mundo</div><div class="cd-done">¡El Mundial ya comenzó!</div></div>`;
@@ -977,7 +1007,7 @@ let cdInterval = null;
 function startCountdown(){
   if(cdInterval) clearInterval(cdInterval);
   cdInterval = setInterval(()=>{
-    const target = new Date('2026-06-11T20:00:00Z');
+    const target = new Date('2026-06-11T19:00:00Z');
     const diff = target - new Date();
     if(diff <= 0){ clearInterval(cdInterval); return; }
     const days  = Math.floor(diff/86400000);
