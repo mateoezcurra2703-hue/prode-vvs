@@ -831,7 +831,14 @@ function rAdmin(){
     </div>
     <div class="card" style="margin-bottom:16px">
       <div class="card-title" style="color:var(--danger)">Zona peligrosa</div>
-      <button class="btn btn-sm" style="background:var(--danger)" onclick="resetAllUsers()">🗑 Borrar todos los participantes</button>
+      <div style="margin-bottom:12px">
+        ${G.users.map(u=>`
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="font-size:0.85rem">${u}</span>
+            <button class="btn btn-sm" style="background:var(--danger);padding:4px 10px;font-size:0.72rem" onclick="deleteUser('${u.replace(/'/g,"\'")}')">Borrar</button>
+          </div>`).join('')}
+      </div>
+      <button class="btn btn-sm" style="background:var(--danger)" onclick="resetAllUsers()">🗑 Borrar todos</button>
     </div>
     <div class="sub-tabs">
       ${'ABCDEFGHIJKL'.split('').map(g=>`
@@ -953,6 +960,15 @@ function saveBonusPick(field,val){const b=getBonus(CU);b[field]=val;setBonus(CU,
 function unlockAdmin(){
   const pw=document.getElementById('APW');
   if(pw?.value===G.adminPw){ADMIN=true;render();}else alert('Contraseña incorrecta');
+}
+function deleteUser(name){
+  if(!confirm('Borrar a '+name+'?'))return;
+  G.users=G.users.filter(u=>u!==name);
+  db.ref('users').set(G.users);
+  db.ref('picks/'+name).remove();
+  db.ref('pins/'+name).remove();
+  db.ref('bonus/'+name).remove();
+  toast('✓ '+name+' eliminado');
 }
 function resetAllUsers(){
   if(!confirm('Borrar todos los participantes y sus picks?'))return;
