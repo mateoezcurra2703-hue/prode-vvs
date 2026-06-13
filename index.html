@@ -420,6 +420,7 @@ function scoreUser(u){
   let total=0,exact=0,correct=0,wrong=0;
   for(const[mid,rv]of Object.entries(r)){
     if(mid==='bonus')continue;
+    if(!hasResult(rv))continue;
     const p=picks[mid];if(!p||p.h===''||p.h==null)continue;
     const isG=mid.startsWith('G');
     const rv_=res(rv.h,rv.a),pv_=res(p.h,p.a);
