@@ -757,7 +757,7 @@ function rKO(){
                      data-mid="${mid}" data-s="h" ${!home||hasResult(rv)||matchStarted(mid)?'disabled':''} style="width:44px"/>
               <span class="score-sep">:</span>
               <input type="number" min="0" max="20" value="${p.a!=null&&p.a!==''?p.a:''}" placeholder="—"
-                     data-mid="${mid}" data-s="a" ${!away||hasResult(rv)?'disabled':''} style="width:44px"/>
+                     data-mid="${mid}" data-s="a" ${!away||hasResult(rv)||matchStarted(mid)?'disabled':''} style="width:44px"/>
             </div>`:`<div style="min-width:80px;text-align:center;color:var(--muted2);font-size:0.82rem">? - ?</div>`}
             <div class="team" style="font-size:0.8rem">${away?`<span style="font-size:1rem">${f(away)}</span> ${away}`:'<span style="color:var(--muted2)">Por definir</span>'}</div>
             <div style="min-width:54px;text-align:center;font-size:0.76rem">${rv?`<div class="result-score">${rv.h}-${rv.a}</div>${tag}`:tag}</div>
