@@ -414,7 +414,7 @@ db.ref('/').on('value', snap => {
   PICKS = CU ? (G.picks[CU] || {}) : {};
   // No re-renderizar si el usuario está escribiendo un score
   const active = document.activeElement;
-  if (active && active.tagName === 'INPUT' && active.dataset.mid) return;
+  if (active && active.tagName === 'INPUT' && (active.dataset.mid || active.dataset.kt)) return;
   render();
   startCountdown();
 });
@@ -1014,8 +1014,7 @@ function saveAdminGroup(gk){
 }
 function saveAdminKO(label){
   collectAdminInputs();
-  db.ref('results').set(G.results).then(()=>{});
-  db.ref('kt').set(G.kt).then(()=>toast('✓ '+label+' guardado'));
+  db.ref('/').update({results:G.results,kt:G.kt}).then(()=>toast('✓ '+label+' guardado'));
 }
 function saveAdminBonus(){
   const c=document.getElementById('BRC')?.value||'';
