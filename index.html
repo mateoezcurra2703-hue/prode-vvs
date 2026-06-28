@@ -376,7 +376,7 @@ function loadOfficialBracket(){
     const el=document.querySelector(`input[data-kt="${k}"]`);
     if(el) el.value=v;
   });
-  db.ref('kt').set(G.kt).then(()=>{
+  db.ref('kt').update(kt).then(()=>{
     _localKt={};
     toast('✓ 16avos cargados');
   });
@@ -1025,8 +1025,25 @@ function saveAdminGroup(gk){
   db.ref('results').set(G.results).then(()=>toast('✓ '+GROUPS[gk].name+' guardado'));
 }
 function saveAdminKO(label){
-  collectAdminInputs();
-  db.ref('/').update({results:G.results,kt:G.kt}).then(()=>toast('✓ '+label+' guardado'));
+  // Save results
+  document.querySelectorAll('input[data-res]').forEach(inp=>{
+    const mid=inp.dataset.res,s=inp.dataset.s;
+    if(!G.results[mid])G.results[mid]={h:'',a:''};
+    G.results[mid][s]=inp.value===''?'':+inp.value;
+  });
+  // Save kt: only non-empty values, use update (merge) not set (overwrite)
+  const ktDelta={};
+  document.querySelectorAll('input[data-kt]').forEach(inp=>{
+    if(inp.value.trim()) ktDelta[inp.dataset.kt]=inp.value.trim();
+  });
+  const p1=db.ref('results').set(G.results);
+  const p2=Object.keys(ktDelta).length>0
+    ? db.ref('kt').update(ktDelta)
+    : Promise.resolve();
+  Promise.all([p1,p2]).then(()=>{
+    Object.assign(G.kt,ktDelta);
+    toast('✓ '+label+' guardado');
+  });
 }
 function saveAdminBonus(){
   const c=document.getElementById('BRC')?.value||'';
