@@ -356,6 +356,20 @@ for(const[gk,g]of Object.entries(GROUPS)){
   });
 }
 
+const BRACKET_R32 = [
+  ['Sudáfrica','Canadá'],['Brasil','Japón'],['Alemania','Paraguay'],['Países Bajos','Marruecos'],
+  ['Costa de Marfil','Noruega'],['Francia','Suecia'],['México','Ecuador'],['Inglaterra','DR Congo'],
+  ['Bélgica','Senegal'],['Estados Unidos','Bosnia y Herz.'],['España','Austria'],['Portugal','Croacia'],
+  ['Suiza','Argelia'],['Australia','Egipto'],['Argentina','Cabo Verde'],['Colombia','Ghana'],
+];
+function loadOfficialBracket(){
+  if(!confirm('Cargar los 16avos oficiales? Esto sobreescribe los equipos actuales.'))return;
+  const kt={};
+  BRACKET_R32.forEach(([h,a],i)=>{kt['r32_'+(i+1)+'_h']=h;kt['r32_'+(i+1)+'_a']=a;});
+  Object.assign(G.kt,kt);
+  db.ref('kt').set(G.kt).then(()=>toast('✓ 16avos cargados'));
+}
+
 const KO_ROUNDS=[
   {id:'r32',label:'16avos de Final',count:16},
   {id:'r16',label:'Octavos de Final',count:8},
@@ -877,7 +891,10 @@ function rAdminKO(){
   return`<datalist id="TLA">${tOpts}</datalist>
   ${KO_ROUNDS.map(round=>`
     <div class="card">
-      <div class="card-title">${round.label}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="card-title" style="margin-bottom:0">${round.label}</div>
+        ${round.id==='r32'?`<button class="btn btn-sm btn-outline" onclick="loadOfficialBracket()" style="font-size:0.72rem">⚡ Bracket oficial</button>`:''}
+      </div>
       ${Array.from({length:round.count},(_,i)=>{
         const mid=`${round.id}_${i+1}`;
         const home=G.kt[`${mid}_h`]||'',away=G.kt[`${mid}_a`]||'';
