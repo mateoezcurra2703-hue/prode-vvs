@@ -734,7 +734,7 @@ function rKO(){
   const tOpts=ALL_TEAMS.map(t=>`<option value="${t}">`).join('');
   return`<datalist id="TL">${tOpts}</datalist>
     <div class="sec-hd"><div class="sec-title">Eliminatorias</div></div>
-    <div class="info-box">Los equipos se cargarán cuando el admin defina los clasificados. Completá tus picks antes de cada partido.</div>
+
     ${KO_ROUNDS.map(round=>{
       const ms=Array.from({length:round.count},(_,i)=>{
         const mid=`${round.id}_${i+1}`;
