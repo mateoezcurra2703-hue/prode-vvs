@@ -362,6 +362,8 @@ const BRACKET_R32 = [
   ['Bélgica','Senegal'],['Estados Unidos','Bosnia y Herz.'],['España','Austria'],['Portugal','Croacia'],
   ['Suiza','Argelia'],['Australia','Egipto'],['Argentina','Cabo Verde'],['Colombia','Ghana'],
 ];
+const DEFAULT_KT={};
+BRACKET_R32.forEach(([h,a],i)=>{DEFAULT_KT['r32_'+(i+1)+'_h']=h;DEFAULT_KT['r32_'+(i+1)+'_a']=a;});
 let _localKt = {};
 function loadOfficialBracket(){
   const kt={};
@@ -417,7 +419,7 @@ db.ref('/').on('value', snap => {
   G = {
     users:     d.users    || [],
     results:   d.results  || {},
-    kt:        Object.assign(d.kt || {}, _localKt),
+    kt:        Object.assign({}, DEFAULT_KT, d.kt || {}, _localKt),
     adminPw:   d.adminPw  || 'mundial2026',
     picks:     d.picks    || {},
     bonusData: d.bonus    || {},
