@@ -1093,6 +1093,8 @@ function rCountdown(){
 }
 
 let cdInterval = null;
+// Re-render cada 30s para lockear picks cuando arranca un partido
+setInterval(()=>{ if(CU) render(); }, 30000);
 function startCountdown(){
   if(cdInterval) clearInterval(cdInterval);
   cdInterval = setInterval(()=>{
