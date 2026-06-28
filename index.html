@@ -362,12 +362,24 @@ const BRACKET_R32 = [
   ['Bélgica','Senegal'],['Estados Unidos','Bosnia y Herz.'],['España','Austria'],['Portugal','Croacia'],
   ['Suiza','Argelia'],['Australia','Egipto'],['Argentina','Cabo Verde'],['Colombia','Ghana'],
 ];
+let _localKt = {};
 function loadOfficialBracket(){
-  if(!confirm('Cargar los 16avos oficiales? Esto sobreescribe los equipos actuales.'))return;
   const kt={};
-  BRACKET_R32.forEach(([h,a],i)=>{kt['r32_'+(i+1)+'_h']=h;kt['r32_'+(i+1)+'_a']=a;});
-  Object.assign(G.kt,kt);
-  db.ref('kt').set(G.kt).then(()=>toast('✓ 16avos cargados'));
+  BRACKET_R32.forEach(([h,a],i)=>{
+    kt['r32_'+(i+1)+'_h']=h;
+    kt['r32_'+(i+1)+'_a']=a;
+  });
+  _localKt = kt;
+  Object.assign(G.kt, kt);
+  // Escribir directo en el DOM sin re-renderizar
+  Object.entries(kt).forEach(([k,v])=>{
+    const el=document.querySelector(`input[data-kt="${k}"]`);
+    if(el) el.value=v;
+  });
+  db.ref('kt').set(G.kt).then(()=>{
+    _localKt={};
+    toast('✓ 16avos cargados');
+  });
 }
 
 const KO_ROUNDS=[
@@ -405,7 +417,7 @@ db.ref('/').on('value', snap => {
   G = {
     users:     d.users    || [],
     results:   d.results  || {},
-    kt:        d.kt       || {},
+    kt:        Object.assign(d.kt || {}, _localKt),
     adminPw:   d.adminPw  || 'mundial2026',
     picks:     d.picks    || {},
     bonusData: d.bonus    || {},
