@@ -673,10 +673,13 @@ function logout(){CU=null;sessionStorage.removeItem('p26_user');PICKS={};render(
 
 function rTodayMatches(){
   const now = new Date();
-  const todayUTC = now.toISOString().slice(0,10); // 'YYYY-MM-DD'
-  // Collect all matches happening today
+  // Comparar en horario ARG (UTC-3)
+  const argOffset = -3*60*60*1000;
+  const nowARG = new Date(now.getTime()+argOffset);
+  const todayARG = nowARG.toISOString().slice(0,10);
+  // Collect all matches happening today (in ARG time)
   const todayMids = Object.entries(MATCH_TIMES)
-    .filter(([mid,t])=>t.slice(0,10)===todayUTC)
+    .filter(([mid,t])=>{ const mARG=new Date(new Date(t).getTime()+argOffset); return mARG.toISOString().slice(0,10)===todayARG; })
     .map(([mid])=>mid);
   if(!todayMids.length) return '';
 
