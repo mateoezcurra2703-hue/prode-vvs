@@ -352,6 +352,11 @@ const MATCH_TIMES = {
   r32_10:'2026-07-02T00:00:00Z', r32_11:'2026-07-02T19:20:00Z', r32_12:'2026-07-02T23:00:00Z',
   r32_13:'2026-07-03T03:00:00Z', r32_14:'2026-07-03T18:00:00Z', r32_15:'2026-07-03T22:00:00Z',
   r32_16:'2026-07-04T01:30:00Z',
+  // Octavos de Final (GMT = UTC, ARG = UTC-3)
+  r16_1:'2026-07-04T17:00:00Z', r16_2:'2026-07-04T21:00:00Z',
+  r16_3:'2026-07-05T20:00:00Z', r16_4:'2026-07-06T00:00:00Z',
+  r16_5:'2026-07-06T19:00:00Z', r16_6:'2026-07-07T00:00:00Z',
+  r16_7:'2026-07-07T16:00:00Z', r16_8:'2026-07-07T20:00:00Z',
 };
 function matchStarted(mid){ const t=MATCH_TIMES[mid]; return t ? new Date()>=new Date(t) : false; }
 
@@ -369,8 +374,15 @@ const BRACKET_R32 = [
   ['Bélgica','Senegal'],['Estados Unidos','Bosnia y Herz.'],['España','Austria'],['Portugal','Croacia'],
   ['Suiza','Argelia'],['Australia','Egipto'],['Argentina','Cabo Verde'],['Colombia','Ghana'],
 ];
+const BRACKET_R16 = [
+  ['Canadá','Marruecos'],['Paraguay','Francia'],
+  ['Brasil','Noruega'],['México','Inglaterra'],
+  ['Portugal','España'],['Estados Unidos','Bélgica'],
+  ['Argentina','Egipto'],['Suiza','Colombia'],
+];
 const DEFAULT_KT={};
 BRACKET_R32.forEach(([h,a],i)=>{DEFAULT_KT['r32_'+(i+1)+'_h']=h;DEFAULT_KT['r32_'+(i+1)+'_a']=a;});
+BRACKET_R16.forEach(([h,a],i)=>{DEFAULT_KT['r16_'+(i+1)+'_h']=h;DEFAULT_KT['r16_'+(i+1)+'_a']=a;});
 let _localKt = {};
 function loadOfficialBracket(){
   const kt={};
