@@ -671,12 +671,57 @@ function logout(){CU=null;sessionStorage.removeItem('p26_user');PICKS={};render(
 
 // ── PICKS ────────────────────────────────────────────────────────────────────
 
+function rTodayMatches(){
+  const now = new Date();
+  const todayUTC = now.toISOString().slice(0,10); // 'YYYY-MM-DD'
+  // Collect all matches happening today
+  const todayMids = Object.entries(MATCH_TIMES)
+    .filter(([mid,t])=>t.slice(0,10)===todayUTC)
+    .map(([mid])=>mid);
+  if(!todayMids.length) return '';
+
+  const rows = todayMids.map(mid=>{
+    const isKO = !mid.startsWith('G');
+    const home = isKO ? (G.kt[mid+'_h']||'') : (GROUP_MATCHES.find(m=>m.id===mid)||{}).home||'';
+    const away = isKO ? (G.kt[mid+'_a']||'') : (GROUP_MATCHES.find(m=>m.id===mid)||{}).away||'';
+    if(!home||!away) return '';
+    const p = PICKS[mid]||{h:'',a:''};
+    const rv = G.results[mid];
+    const locked = hasResult(rv)||matchStarted(mid);
+    const t = MATCH_TIMES[mid];
+    const timeStr = t ? new Date(t).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',timeZone:'America/Argentina/Buenos_Aires'}) : '';
+    const st = pickSt(mid,p,G.results);
+    const tag = st==='exact'?`<span class="result-tag exact-tag">+${isKO?4:3}⭐</span>`
+      :st==='correct'?`<span class="result-tag correct-tag">+${isKO?2:1}✓</span>`
+      :st==='wrong'?`<span class="result-tag wrong-tag">✗</span>`:'';
+    return`<div class="match-row" style="padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="font-size:0.7rem;color:var(--muted);min-width:36px">${timeStr}</div>
+      <div class="team right" style="font-size:0.82rem">${home} ${f(home)}</div>
+      <div class="score-box">
+        <input type="number" min="0" max="20" value="${p.h!=null&&p.h!==''?p.h:''}" placeholder="—"
+          data-mid="${mid}" data-s="h" ${locked?'disabled':''} style="width:40px"/>
+        <span class="score-sep">:</span>
+        <input type="number" min="0" max="20" value="${p.a!=null&&p.a!==''?p.a:''}" placeholder="—"
+          data-mid="${mid}" data-s="a" ${locked?'disabled':''} style="width:40px"/>
+      </div>
+      <div class="team" style="font-size:0.82rem">${f(away)} ${away}</div>
+      <div style="min-width:54px;text-align:center;font-size:0.76rem">${rv&&hasResult(rv)?`<div class="result-score">${rv.h}-${rv.a}</div>${tag}`:tag}</div>
+    </div>`;
+  }).filter(Boolean).join('');
+
+  if(!rows) return '';
+  return`<div class="card" style="margin-bottom:16px">
+    <div class="card-title" style="color:var(--accent)">⚽ Partidos de hoy</div>
+    ${rows}
+  </div>`;
+}
+
 function rPicks(){
   const cdHtml = rCountdown();
   const total=GROUP_MATCHES.length;
   const done=GROUP_MATCHES.filter(m=>{const p=PICKS[m.id];return p&&p.h!=null&&p.h!==''}).length;
   const pct=Math.round(done/total*100);
-  return cdHtml+`
+  return cdHtml+rTodayMatches()+`
     <div class="sec-hd">
       <div>
         <div class="sec-title">Mis Picks — Fase de Grupos</div>
