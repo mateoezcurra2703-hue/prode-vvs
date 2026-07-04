@@ -444,6 +444,7 @@ db.ref('/').on('value', snap => {
     bonusData: d.bonus    || {},
     pins:     d.pins     || {}
   };
+  computeProgression();
   PICKS = CU ? (G.picks[CU] || {}) : {};
   // No re-renderizar si el usuario está escribiendo un score
   const active = document.activeElement;
@@ -460,6 +461,36 @@ function getBonus(u){ return G.bonusData[u] || {}; }
 function setBonus(u,b){ db.ref('bonus/'+u).set(b); }
 
 // ── SCORING ─────────────────────────────────────────────────────────────────
+
+function computeProgression(){
+  function winner(mid){
+    const rv=G.results[mid];
+    if(!hasResult(rv))return null;
+    return res(rv.h,rv.a)==='H'?G.kt[mid+'_h']:G.kt[mid+'_a'];
+  }
+  function loser(mid){
+    const rv=G.results[mid];
+    if(!hasResult(rv))return null;
+    return res(rv.h,rv.a)==='H'?G.kt[mid+'_a']:G.kt[mid+'_h'];
+  }
+  // Cuartos desde Octavos
+  [[1,2],[3,4],[5,6],[7,8]].forEach(([a,b],i)=>{
+    const h=winner('r16_'+a),aw=winner('r16_'+b);
+    if(h)G.kt['qf_'+(i+1)+'_h']=h;
+    if(aw)G.kt['qf_'+(i+1)+'_a']=aw;
+  });
+  // Semis desde Cuartos
+  [[1,2],[3,4]].forEach(([a,b],i)=>{
+    const h=winner('qf_'+a),aw=winner('qf_'+b);
+    if(h)G.kt['sf_'+(i+1)+'_h']=h;
+    if(aw)G.kt['sf_'+(i+1)+'_a']=aw;
+  });
+  // Final y 3er puesto desde Semis
+  const sf1w=winner('sf_1'),sf2w=winner('sf_2');
+  const sf1l=loser('sf_1'),sf2l=loser('sf_2');
+  if(sf1w)G.kt['fn_1_h']=sf1w; if(sf2w)G.kt['fn_1_a']=sf2w;
+  if(sf1l)G.kt['fn_2_h']=sf1l; if(sf2l)G.kt['fn_2_a']=sf2l;
+}
 
 function res(h,a){if(h==null||a==null||h===''||a==='')return null;return+h>+a?'H':+a>+h?'A':'D';}
 
