@@ -357,6 +357,9 @@ const MATCH_TIMES = {
   r16_3:'2026-07-05T20:00:00Z', r16_4:'2026-07-06T00:00:00Z',
   r16_5:'2026-07-06T19:00:00Z', r16_6:'2026-07-07T00:00:00Z',
   r16_7:'2026-07-07T16:00:00Z', r16_8:'2026-07-07T20:00:00Z',
+  // Cuartos de Final (UTC, ARG=UTC-3)
+  qf_1:'2026-07-09T20:00:00Z', qf_2:'2026-07-10T19:00:00Z',
+  qf_3:'2026-07-11T21:00:00Z', qf_4:'2026-07-13T01:00:00Z',
 };
 function matchStarted(mid){ const t=MATCH_TIMES[mid]; return t ? new Date()>=new Date(t) : false; }
 
@@ -374,6 +377,10 @@ const BRACKET_R32 = [
   ['Bélgica','Senegal'],['Estados Unidos','Bosnia y Herz.'],['España','Austria'],['Portugal','Croacia'],
   ['Suiza','Argelia'],['Australia','Egipto'],['Argentina','Cabo Verde'],['Colombia','Ghana'],
 ];
+const BRACKET_QF = [
+  ['Francia','Marruecos'],['España','Bélgica'],
+  ['Noruega','Inglaterra'],['Argentina','Suiza'],
+];
 const BRACKET_R16 = [
   ['Canadá','Marruecos'],['Paraguay','Francia'],
   ['Brasil','Noruega'],['México','Inglaterra'],
@@ -383,6 +390,7 @@ const BRACKET_R16 = [
 const DEFAULT_KT={};
 BRACKET_R32.forEach(([h,a],i)=>{DEFAULT_KT['r32_'+(i+1)+'_h']=h;DEFAULT_KT['r32_'+(i+1)+'_a']=a;});
 BRACKET_R16.forEach(([h,a],i)=>{DEFAULT_KT['r16_'+(i+1)+'_h']=h;DEFAULT_KT['r16_'+(i+1)+'_a']=a;});
+BRACKET_QF.forEach(([h,a],i)=>{DEFAULT_KT['qf_'+(i+1)+'_h']=h;DEFAULT_KT['qf_'+(i+1)+'_a']=a;});
 let _localKt = {};
 function loadOfficialBracket(){
   const kt={};
@@ -466,18 +474,23 @@ function computeProgression(){
   function winner(mid){
     const rv=G.results[mid];
     if(!hasResult(rv))return null;
-    return res(rv.h,rv.a)==='H'?G.kt[mid+'_h']:G.kt[mid+'_a'];
+    const r=res(rv.h,rv.a);
+    if(r==='H')return G.kt[mid+'_h'];
+    if(r==='A')return G.kt[mid+'_a'];
+    return null; // empate → penales, no se puede determinar ganador automáticamente
   }
   function loser(mid){
     const rv=G.results[mid];
     if(!hasResult(rv))return null;
     return res(rv.h,rv.a)==='H'?G.kt[mid+'_a']:G.kt[mid+'_h'];
   }
-  // Cuartos desde Octavos
+  // Cuartos desde Octavos (solo si no están hardcodeados)
   [[1,2],[3,4],[5,6],[7,8]].forEach(([a,b],i)=>{
-    const h=winner('r16_'+a),aw=winner('r16_'+b);
-    if(h)G.kt['qf_'+(i+1)+'_h']=h;
-    if(aw)G.kt['qf_'+(i+1)+'_a']=aw;
+    const kh='qf_'+(i+1)+'_h',ka='qf_'+(i+1)+'_a';
+    if(!DEFAULT_KT[kh]){
+      const h=winner('r16_'+a),aw=winner('r16_'+b);
+      if(h)G.kt[kh]=h; if(aw)G.kt[ka]=aw;
+    }
   });
   // Semis desde Cuartos
   [[1,2],[3,4]].forEach(([a,b],i)=>{
