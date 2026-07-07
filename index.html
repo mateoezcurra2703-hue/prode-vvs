@@ -360,6 +360,8 @@ const MATCH_TIMES = {
   // Cuartos de Final (UTC, ARG=UTC-3)
   qf_1:'2026-07-09T20:00:00Z', qf_2:'2026-07-10T19:00:00Z',
   qf_3:'2026-07-11T21:00:00Z', qf_4:'2026-07-13T01:00:00Z',
+  // Semifinales
+  sf_1:'2026-07-14T19:00:00Z', sf_2:'2026-07-15T19:00:00Z',
 };
 function matchStarted(mid){ const t=MATCH_TIMES[mid]; return t ? new Date()>=new Date(t) : false; }
 
